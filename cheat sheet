@@ -1,0 +1,20 @@
+
+#Login to azure
+az login
+
+#create azure auth:  (required for automatic deployment of resources)
+az ad sp create-for-rbac --sdk-auth > azure.auth
+
+#Create resources:
+java -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar AzureManagement
+
+-----------------------------------------------------------------------------------------------------------------
+
+#Compile project:
+mvn compile assembly:single
+
+#Delete resources:
+java -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar  AzureManagement -delete
+
+#Command to set app name:
+az functionapp config appsettings set --name scc2122app-westeurope-n49067n52405n45081 --resource-group westeurope
