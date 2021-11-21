@@ -1,4 +1,7 @@
 
+#Compile project:
+mvn compile assembly:single
+
 #Login to azure
 az login
 
@@ -6,20 +9,8 @@ az login
 az ad sp create-for-rbac --sdk-auth --role Owner --years 3 > azure.auth
 
 #Create resources:
-java -Dsun.net.client.defaultReadTimeout=1000000 -Dsun.net.client.defaultConnectTimeout=1000000 -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar AzureManagement
+java -Dsun.net.client.defaultReadTimeout=1000000 -Dsun.net.client.defaultConnectTimeout=1000000 -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar AzureManagement rodrigo
 
-
-
-
-
-
------------------------------------------------------------------------------------------------------------------
-
-#Compile project:
-mvn compile assembly:single
 
 #Delete resources:
-java -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar  AzureManagement -delete
-
-#Command to set app name:
-az functionapp config appsettings set --name scc2122app-westeurope-n49067n52405n45081 --resource-group westeurope
+java -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar  AzureManagement rodrigo -delete
