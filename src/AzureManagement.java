@@ -43,8 +43,6 @@ public class AzureManagement {
 			final Map<String, Map<String, String>> props = new HashMap<String, Map<String, String>>();
 			Arrays.stream(CONFIG.REGIONS).forEach(reg -> props.put(reg.name(), new HashMap<String, String>()));
 
-			List<Thread> threads = new ArrayList<Thread>();
-
 			final Azure azure = createManagementClient(CONFIG.AZURE_AUTH_LOCATION);
 			if (args.length >= 2 && args[1].equalsIgnoreCase("-delete")) {
 				Arrays.stream(CONFIG.AZURE_RG_REGIONS).forEach(reg -> deleteResourceGroup(azure, reg));
@@ -67,88 +65,75 @@ public class AzureManagement {
 					createResourceGroup(azure, CONFIG.AZURE_RG_REGIONS[i], CONFIG.REGIONS[i]);
 
 				if (CONFIG.CREATE_STORAGE) {
-					Thread th = new Thread(() -> {
-						try {
-							final Azure azure0 = createManagementClient(CONFIG.AZURE_AUTH_LOCATION);
-							for (int i = 0; i < CONFIG.REGIONS.length; i++) {
-								StorageAccount accountStorage = createStorageAccount(azure0, CONFIG.AZURE_RG_REGIONS[i],
-										CONFIG.AZURE_STORAGE_NAME[i], CONFIG.REGIONS[i]);
-								dumpStorageKey(props.get(CONFIG.REGIONS[i].name()), CONFIG.AZURE_PROPS_LOCATIONS[i],
-										CONFIG.AZURE_SETTINGS_LOCATIONS[i], CONFIG.AZURE_APP_NAME[i], CONFIG.AZURE_FUNCTIONS_NAME[i],
-										CONFIG.AZURE_RG_REGIONS[i], accountStorage);
-								for (String cont : CONFIG.BLOB_CONTAINERS)
-									createBlobContainer(azure0, CONFIG.AZURE_RG_REGIONS[i], CONFIG.AZURE_STORAGE_NAME[i], cont);
-							}
-							System.err.println("Azure Blobs Storage resources created with success");
-
-						} catch (Exception e) {
-							System.err.println("Error while creating storage resources");
-							e.printStackTrace();
+					try {
+						final Azure azure0 = createManagementClient(CONFIG.AZURE_AUTH_LOCATION);
+						for (int i = 0; i < CONFIG.REGIONS.length; i++) {
+							StorageAccount accountStorage = createStorageAccount(azure0, CONFIG.AZURE_RG_REGIONS[i],
+									CONFIG.AZURE_STORAGE_NAME[i], CONFIG.REGIONS[i]);
+							dumpStorageKey(props.get(CONFIG.REGIONS[i].name()), CONFIG.AZURE_PROPS_LOCATIONS[i],
+									CONFIG.AZURE_SETTINGS_LOCATIONS[i], CONFIG.AZURE_APP_NAME[i], CONFIG.AZURE_FUNCTIONS_NAME[i],
+									CONFIG.AZURE_RG_REGIONS[i], accountStorage);
+							for (String cont : CONFIG.BLOB_CONTAINERS)
+								createBlobContainer(azure0, CONFIG.AZURE_RG_REGIONS[i], CONFIG.AZURE_STORAGE_NAME[i], cont);
 						}
-						return;
-					});
-					th.start();
-					threads.add(th);
+						System.err.println("Azure Blobs Storage resources created with success");
+
+					} catch (Exception e) {
+						System.err.println("Error while creating storage resources");
+						e.printStackTrace();
+						System.exit(-1);
+					}
 				}
 
 				if (CONFIG.CREATE_COSMOSDB) {
-					Thread th = new Thread(() -> {
-						try {
-							final Azure azure0 = createManagementClient(CONFIG.AZURE_AUTH_LOCATION);
-							CosmosDBAccount accountCosmosDB = createCosmosDBAccount(azure0, CONFIG.AZURE_RG_REGIONS[0],
-									CONFIG.AZURE_COSMOSDB_NAME, CONFIG.REGIONS);
-							for (int i = 0; i < CONFIG.REGIONS.length; i++) {
-								dumpCosmosDBKey(props.get(CONFIG.REGIONS[i].name()), CONFIG.AZURE_PROPS_LOCATIONS[i],
-										CONFIG.AZURE_SETTINGS_LOCATIONS[i], CONFIG.AZURE_APP_NAME[i], CONFIG.AZURE_FUNCTIONS_NAME[i],
-										CONFIG.AZURE_RG_REGIONS[i], CONFIG.AZURE_COSMOSDB_DATABASE, accountCosmosDB);
-							}
-							CosmosClient cosmosClient = getCosmosClient(accountCosmosDB);
-							createCosmosDatabase(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE);
-
-							//TODO: create the collections you have in your application
-							createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Users", "/idUser", new String[]{"/idUser"});
-							createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Channels", "/idChannel", new String[]{"/idChannel"});
-							createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Messages", "/idChannel", new String[]{"/idMessage"});
-
-							System.err.println("Azure Cosmos DB resources created with success");
-
-						} catch (Exception e) {
-							System.err.println("Error while creating cosmos db resources");
-							e.printStackTrace();
+					try {
+						final Azure azure0 = createManagementClient(CONFIG.AZURE_AUTH_LOCATION);
+						CosmosDBAccount accountCosmosDB = createCosmosDBAccount(azure0, CONFIG.AZURE_RG_REGIONS[0],
+								CONFIG.AZURE_COSMOSDB_NAME, CONFIG.REGIONS);
+						for (int i = 0; i < CONFIG.REGIONS.length; i++) {
+							dumpCosmosDBKey(props.get(CONFIG.REGIONS[i].name()), CONFIG.AZURE_PROPS_LOCATIONS[i],
+									CONFIG.AZURE_SETTINGS_LOCATIONS[i], CONFIG.AZURE_APP_NAME[i], CONFIG.AZURE_FUNCTIONS_NAME[i],
+									CONFIG.AZURE_RG_REGIONS[i], CONFIG.AZURE_COSMOSDB_DATABASE, accountCosmosDB);
 						}
-					});
-					th.start();
-					threads.add(th);
+						CosmosClient cosmosClient = getCosmosClient(accountCosmosDB);
+						createCosmosDatabase(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE);
+
+						//TODO: create the collections you have in your application
+						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Users", "/idUser", new String[]{"/idUser"});
+						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Channels", "/idChannel", new String[]{"/idChannel"});
+						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Messages", "/idChannel", new String[]{"/idMessage"});
+
+						System.err.println("Azure Cosmos DB resources created with success");
+					} catch (Exception e) {
+						System.err.println("Error while creating cosmos db resources");
+						e.printStackTrace();
+						System.exit(-1);
+					}
 				}
 
 				if (CONFIG.CREATE_REDIS) {
-					Thread th = new Thread(() -> {
-						try {
-							final Azure azure0 = createManagementClient(CONFIG.AZURE_AUTH_LOCATION);
-							for (int i = 0; i < CONFIG.REGIONS.length; i++) {
-								RedisCache cache = createRedis(azure0, CONFIG.AZURE_RG_REGIONS[i], CONFIG.AZURE_REDIS_NAME[i],
-										CONFIG.REGIONS[i]);
-								dumpRedisCacheInfo(props.get(CONFIG.REGIONS[i].name()), CONFIG.AZURE_PROPS_LOCATIONS[i],
-										CONFIG.AZURE_SETTINGS_LOCATIONS[i], CONFIG.AZURE_APP_NAME[i], CONFIG.AZURE_FUNCTIONS_NAME[i],
-										CONFIG.AZURE_RG_REGIONS[i], cache);
-							}
-							System.err.println("Azure Redis resources created with success");
-						} catch (Exception e) {
-							System.err.println("Error while creating redis resources");
-							e.printStackTrace();
+					try {
+						final Azure azure0 = createManagementClient(CONFIG.AZURE_AUTH_LOCATION);
+						for (int i = 0; i < CONFIG.REGIONS.length; i++) {
+							RedisCache cache = createRedis(azure0, CONFIG.AZURE_RG_REGIONS[i], CONFIG.AZURE_REDIS_NAME[i],
+									CONFIG.REGIONS[i]);
+							dumpRedisCacheInfo(props.get(CONFIG.REGIONS[i].name()), CONFIG.AZURE_PROPS_LOCATIONS[i],
+									CONFIG.AZURE_SETTINGS_LOCATIONS[i], CONFIG.AZURE_APP_NAME[i], CONFIG.AZURE_FUNCTIONS_NAME[i],
+									CONFIG.AZURE_RG_REGIONS[i], cache);
 						}
-					});
-					th.start();
-					threads.add(th);
+						System.err.println("Azure Redis resources created with success");
+					} catch (Exception e) {
+						System.err.println("Error while creating redis resources");
+						e.printStackTrace();
+						System.exit(-1);
+					}
 				}
 
-			}
-			for (Thread th : threads) {
-				th.join();
 			}
 		} catch (Exception e) {
 			System.err.println("Error while creating resources");
 			e.printStackTrace();
+			System.exit(-1);
 		}
 		System.exit(0);
 	}
@@ -192,11 +177,11 @@ public class AzureManagement {
 		return container;
 	}
 
-	public synchronized static void recordStorageKey(Azure azure, String propFilename, String settingsFilename,
+	public static void recordStorageKey(Azure azure, String propFilename, String settingsFilename,
 			String functionsName, String functionsRGName, StorageAccount account) throws IOException {
 	}
 
-	public synchronized static void dumpStorageKey(Map<String, String> props, String propFilename,
+	public static void dumpStorageKey(Map<String, String> props, String propFilename,
 			String settingsFilename, String appName, String functionName, String rgName, StorageAccount account)
 			throws IOException {
 		List<StorageAccountKey> storageAccountKeys = account.getKeys();
@@ -208,14 +193,10 @@ public class AzureManagement {
 				storageAccountKeys.get(0).value() +
 				";EndpointSuffix=core.windows.net";
 
-		synchronized (props) {
-			props.put("BlobStoreConnection", key);
-		}
+		props.put("BlobStoreConnection", key);
 
-		synchronized (AzureManagement.class) {
-			Files.write(Paths.get(propFilename), ("BlobStoreConnection=" + key + "\n").getBytes(),
-					StandardOpenOption.APPEND);
-		}
+		Files.write(Paths.get(propFilename), ("BlobStoreConnection=" + key + "\n").getBytes(), StandardOpenOption.APPEND);
+
 		StringBuilder cmd = new StringBuilder();
 		if (functionName != null) {
 			cmd.append("az functionapp config appsettings set --name ");
@@ -235,9 +216,8 @@ public class AzureManagement {
 			cmd.append(key);
 			cmd.append("\"\n");
 		}
-		synchronized (AzureManagement.class) {
-			Files.write(Paths.get(settingsFilename), cmd.toString().getBytes(), StandardOpenOption.APPEND);
-		}
+
+		Files.write(Paths.get(settingsFilename), cmd.toString().getBytes(), StandardOpenOption.APPEND);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -264,23 +244,22 @@ public class AzureManagement {
 		return account;
 	}
 
-	public synchronized static void dumpCosmosDBKey(Map<String, String> props, String propFilename,
-			String settingsFilename, String appName, String functionName, String rgName, String databaseName,
-			CosmosDBAccount account) throws IOException {
-		synchronized (AzureManagement.class) {
-			Files.write(Paths.get(propFilename),
-					("COSMOSDB_KEY=" + account.listKeys().primaryMasterKey() + "\n").getBytes(),
-					StandardOpenOption.APPEND);
-			Files.write(Paths.get(propFilename), ("COSMOSDB_URL=" + account.documentEndpoint() + "\n").getBytes(),
-					StandardOpenOption.APPEND);
-			Files.write(Paths.get(propFilename), ("COSMOSDB_DATABASE=" + databaseName + "\n").getBytes(),
-					StandardOpenOption.APPEND);
-		}
-		synchronized (props) {
-			props.put("COSMOSDB_KEY", account.listKeys().primaryMasterKey());
-			props.put("COSMOSDB_URL", account.documentEndpoint());
-			props.put("COSMOSDB_DATABASE", databaseName);
-		}
+	public static void dumpCosmosDBKey(Map<String, String> props, String propFilename,
+		String settingsFilename, String appName, String functionName, String rgName, String databaseName,
+		CosmosDBAccount account) throws IOException {
+
+		Files.write(Paths.get(propFilename),
+				("COSMOSDB_KEY=" + account.listKeys().primaryMasterKey() + "\n").getBytes(),
+				StandardOpenOption.APPEND);
+		Files.write(Paths.get(propFilename), ("COSMOSDB_URL=" + account.documentEndpoint() + "\n").getBytes(),
+				StandardOpenOption.APPEND);
+		Files.write(Paths.get(propFilename), ("COSMOSDB_DATABASE=" + databaseName + "\n").getBytes(),
+				StandardOpenOption.APPEND);
+
+
+		props.put("COSMOSDB_KEY", account.listKeys().primaryMasterKey());
+		props.put("COSMOSDB_URL", account.documentEndpoint());
+		props.put("COSMOSDB_DATABASE", databaseName);
 
 		StringBuilder cmd = new StringBuilder();
 		if (appName != null) {
@@ -317,9 +296,8 @@ public class AzureManagement {
 			cmd.append(account.listKeys().primaryMasterKey());
 			cmd.append(";\"");
 		}
-		synchronized (AzureManagement.class) {
-			Files.write(Paths.get(settingsFilename), cmd.toString().getBytes(), StandardOpenOption.APPEND);
-		}
+
+		Files.write(Paths.get(settingsFilename), cmd.toString().getBytes(), StandardOpenOption.APPEND);
 	}
 
 	public static CosmosClient getCosmosClient(CosmosDBAccount account) {
@@ -377,20 +355,17 @@ public class AzureManagement {
 		}
 	}
 
-	public synchronized static void dumpRedisCacheInfo(Map<String, String> props, String propFilename, 
-				String settingsFilename, String appName, String functionName, String rgName, RedisCache cache)
-			throws IOException {
+	public static void dumpRedisCacheInfo(Map<String, String> props, String propFilename, String settingsFilename, String appName, String functionName, String rgName, RedisCache cache) throws IOException {
 		RedisAccessKeys redisAccessKey = cache.regenerateKey(RedisKeyType.PRIMARY);
-		synchronized (AzureManagement.class) {
-			Files.write(Paths.get(propFilename), ("REDIS_KEY=" + redisAccessKey.primaryKey() + "\n").getBytes(),
-					StandardOpenOption.APPEND);
-			Files.write(Paths.get(propFilename), ("REDIS_URL=" + cache.hostName() + "\n").getBytes(),
-					StandardOpenOption.APPEND);
-		}
-		synchronized (props) {
-			props.put("REDIS_KEY", redisAccessKey.primaryKey());
-			props.put("REDIS_URL", cache.hostName());
-		}
+
+		Files.write(Paths.get(propFilename), ("REDIS_KEY=" + redisAccessKey.primaryKey() + "\n").getBytes(),
+				StandardOpenOption.APPEND);
+		Files.write(Paths.get(propFilename), ("REDIS_URL=" + cache.hostName() + "\n").getBytes(),
+				StandardOpenOption.APPEND);
+
+		props.put("REDIS_KEY", redisAccessKey.primaryKey());
+		props.put("REDIS_URL", cache.hostName());
+
 		StringBuilder cmd = new StringBuilder();
 		if (appName != null) {
 			cmd.append("az functionapp config appsettings set --name ");
@@ -424,9 +399,8 @@ public class AzureManagement {
 			cmd.append(cache.hostName());
 			cmd.append("\"\n");
 		}
-		synchronized (AzureManagement.class) {
-			Files.write(Paths.get(settingsFilename), cmd.toString().getBytes(), StandardOpenOption.APPEND);
-		}
+		
+		Files.write(Paths.get(settingsFilename), cmd.toString().getBytes(), StandardOpenOption.APPEND);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

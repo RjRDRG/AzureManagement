@@ -53,7 +53,7 @@ public class AzureConfig {
     public AzureConfig(String suffix) {
         AZURE_AUTH_LOCATION = "azure.auth";
 
-       CREATE_STORAGE = true;
+        CREATE_STORAGE = true;
         CREATE_COSMOSDB = true;
         CREATE_REDIS = true;
 
@@ -61,7 +61,7 @@ public class AzureConfig {
         MY_SUFFIX = Optional.ofNullable(suffix).orElse("adrqrd");
 
         AZURE_COSMOSDB_NAME = MY_PREFIX + MY_SUFFIX;
-        AZURE_COSMOSDB_DATABASE = MY_PREFIX + "db" + MY_SUFFIX;
+        AZURE_COSMOSDB_DATABASE = MY_PREFIX + "db";
         BLOB_CONTAINERS = new String[]{"images"};
 
         REGIONS = new Region[] { Region.EUROPE_WEST };

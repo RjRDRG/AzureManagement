@@ -9,8 +9,8 @@ az login
 az ad sp create-for-rbac --sdk-auth --role Owner --years 3 > azure.auth
 
 #Create resources:
-java -Dsun.net.client.defaultReadTimeout=1000000 -Dsun.net.client.defaultConnectTimeout=1000000 -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar AzureManagement rodrigo
+java -Dsun.net.client.defaultReadTimeout=1000000 -Dsun.net.client.defaultConnectTimeout=1000000 -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar AzureManagement rjr
 
 
 #Delete resources:
-java -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar  AzureManagement rodrigo -delete
+java -cp target/AzureManagement-1.0-SNAPSHOT-jar-with-dependencies.jar  AzureManagement rjr -delete
