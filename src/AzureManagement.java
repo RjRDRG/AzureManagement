@@ -99,9 +99,9 @@ public class AzureManagement {
 						createCosmosDatabase(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE);
 
 						//TODO: create the collections you have in your application
-						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Users", "/id", new String[]{"/id"});
-						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Channels", "/id", new String[]{"/id"});
-						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Messages", "/channel", new String[]{"/id"});
+						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Users", "/id", new String[0]);
+						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Channels", "/id", new String[0]);
+						createCosmosCollection(cosmosClient, CONFIG.AZURE_COSMOSDB_DATABASE, "Messages", "/channel", new String[0]);
 
 						System.err.println("Azure Cosmos DB resources created with success");
 					} catch (Exception e) {
