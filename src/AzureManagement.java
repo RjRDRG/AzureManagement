@@ -270,6 +270,7 @@ public class AzureManagement {
 			cmd.append(" --settings \"COSMOSDB_KEY=");
 			cmd.append(account.listKeys().primaryMasterKey());
 			cmd.append("\"\n");
+
 			cmd.append("az functionapp config appsettings set --name ");
 			cmd.append(appName);
 			cmd.append(" --resource-group ");
@@ -277,6 +278,7 @@ public class AzureManagement {
 			cmd.append(" --settings \"COSMOSDB_URL=");
 			cmd.append(account.documentEndpoint());
 			cmd.append("\"\n");
+
 			cmd.append("az functionapp config appsettings set --name ");
 			cmd.append(appName);
 			cmd.append(" --resource-group ");
@@ -294,6 +296,29 @@ public class AzureManagement {
 			cmd.append(account.documentEndpoint());
 			cmd.append(";AccountKey=");
 			cmd.append(account.listKeys().primaryMasterKey());
+
+			cmd.append("az functionapp config appsettings set --name ");
+			cmd.append(functionName);
+			cmd.append(" --resource-group ");
+			cmd.append(rgName);
+			cmd.append(" --settings \"COSMOSDB_KEY=");
+			cmd.append(account.listKeys().primaryMasterKey());
+			cmd.append("\"\n");
+
+			cmd.append("az functionapp config appsettings set --name ");
+			cmd.append(functionName);
+			cmd.append(" --resource-group ");
+			cmd.append(rgName);
+			cmd.append(" --settings \"COSMOSDB_URL=");
+			cmd.append(account.documentEndpoint());
+			cmd.append("\"\n");
+
+			cmd.append("az functionapp config appsettings set --name ");
+			cmd.append(functionName);
+			cmd.append(" --resource-group ");
+			cmd.append(rgName);
+			cmd.append(" --settings \"COSMOSDB_DATABASE=");
+			cmd.append(databaseName);
 			cmd.append(";\"");
 		}
 
@@ -375,6 +400,7 @@ public class AzureManagement {
 			cmd.append(" --settings \"REDIS_KEY=");
 			cmd.append(redisAccessKey.primaryKey());
 			cmd.append("\"\n");
+
 			cmd.append("az functionapp config appsettings set --name ");
 			cmd.append(appName);
 			cmd.append(" --resource-group ");
@@ -391,6 +417,7 @@ public class AzureManagement {
 			cmd.append(" --settings \"REDIS_KEY=");
 			cmd.append(redisAccessKey.primaryKey());
 			cmd.append("\"\n");
+
 			cmd.append("az functionapp config appsettings set --name ");
 			cmd.append(functionName);
 			cmd.append(" --resource-group ");
