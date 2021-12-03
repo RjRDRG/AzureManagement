@@ -53,8 +53,8 @@ public class AzureConfig {
     public AzureConfig(String suffix) {
         AZURE_AUTH_LOCATION = "azure.auth";
 
-        CREATE_STORAGE = true;
-        CREATE_COSMOSDB = true;
+        CREATE_STORAGE = false;
+        CREATE_COSMOSDB = false;
         CREATE_REDIS = true;
 
         MY_PREFIX= "scc2122";
